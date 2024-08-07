@@ -16,7 +16,7 @@ import java.util.Scanner;
 * - Alterações de reserva só podem ocorrer para datas futuras.
 * - A data de saída deve ser maior que a data de entrada.*/
 
-//Jeito Ruim
+//Ruim
 @SpringBootApplication
 public class CriandoExcecoesPersonalizadasApplication {
 
@@ -45,17 +45,16 @@ public class CriandoExcecoesPersonalizadasApplication {
             System.out.print("Check- Out date (dd/MM/yyyy): ");
             checkOut = sdf.parse(sc.next());
 
-            Date now = new Date();
-            //validação se a date de CheckIn foi atualizado para depois da data da primeira reserva-
-            if (checkIn.before(now) || checkOut.before(now)) {
-                System.out.println("Error in reservation: Reservation dates for update must be future dates");
-            } else if (!checkOut.after(checkIn)) {
-                System.out.println("Error in reservation: Reservation dates for update must be future dates");
-            } else {
-                reservation.updateDates(checkIn, checkOut);
+            //Como vai retornar um String, declaramos o metodo como String.
+            String error = reservation.updateDates(checkIn, checkOut);
+            if(error != null){
+                System.out.println("Error in reservation: " + error);
+            }else {
                 System.out.println("Reservation: " + reservation);
-                sc.close();
             }
+
+            sc.close();
+
         }
     }
 }

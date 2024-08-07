@@ -45,9 +45,19 @@ public class Reservation {
          return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }
 
-    public void updateDates(Date checkin, Date checkout){
+    public String updateDates(Date checkIn, Date checkOut){
+
+        Date now = new Date();
+        //validação se a date de CheckIn foi atualizado para depois da data da primeira reserva-
+        if (checkIn.before(now) || checkOut.before(now)) {
+            return "Reservation dates for update must be future dates";
+        } else if (!checkOut.after(checkIn)) {
+            return "Check-Out date must be after check-in date";
+        }
         this.checkin = checkin;
         this.checkout = checkout;
+        //caso retorne null, é pq não deu error
+        return null;
     }
 
     //Sempre colocar Override no ToString
