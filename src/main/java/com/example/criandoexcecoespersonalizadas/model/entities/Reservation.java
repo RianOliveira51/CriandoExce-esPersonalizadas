@@ -1,8 +1,11 @@
-package com.example.criandoexcecoespersonalizadas.entities;
+package com.example.criandoexcecoespersonalizadas.model.entities;
+
+import com.example.criandoexcecoespersonalizadas.model.exception.DomainException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
 
 public class Reservation {
     private Integer roomNumber;
@@ -15,7 +18,10 @@ public class Reservation {
 
     }
 
-    public Reservation(Integer roomNumber, Date checkin, Date checkout){
+    public Reservation(Integer roomNumber, Date checkin, Date checkout) throws DomainException{
+        if (!checkout.after(checkin)) {
+            throw new DomainException("Check-Out date must be after check-in date") ;
+        }
         this.roomNumber = roomNumber;
         this.checkin = checkin;
         this.checkout = checkout;
@@ -45,19 +51,23 @@ public class Reservation {
          return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }
 
-    public String updateDates(Date checkIn, Date checkOut){
+    public void updateDates(Date checkIn, Date checkOut) throws DomainException{
 
         Date now = new Date();
         //validação se a date de CheckIn foi atualizado para depois da data da primeira reserva-
         if (checkIn.before(now) || checkOut.before(now)) {
-            return "Reservation dates for update must be future dates";
-        } else if (!checkOut.after(checkIn)) {
-            return "Check-Out date must be after check-in date";
+            /*lançando uma exceção, caso a verificação entre no if.
+            IllegalArgumentException - para tradar metodos da exceção.
+            DomainException - Exceção criada.*/
+
+            throw new DomainException("Reservation dates for update must be future dates");
+        }
+        if (!checkOut.after(checkIn)) {
+            throw new DomainException("Check-Out date must be after check-in date") ;
         }
         this.checkin = checkin;
         this.checkout = checkout;
         //caso retorne null, é pq não deu error
-        return null;
     }
 
     //Sempre colocar Override no ToString

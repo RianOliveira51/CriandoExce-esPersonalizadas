@@ -1,7 +1,7 @@
 package com.example.criandoexcecoespersonalizadas;
 
-import com.example.criandoexcecoespersonalizadas.entities.Reservation;
-import org.springframework.boot.SpringApplication;
+import com.example.criandoexcecoespersonalizadas.model.entities.Reservation;
+import com.example.criandoexcecoespersonalizadas.model.exception.DomainException;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.text.ParseException;
@@ -16,25 +16,24 @@ import java.util.Scanner;
 * - Alterações de reserva só podem ocorrer para datas futuras.
 * - A data de saída deve ser maior que a data de entrada.*/
 
-//Ruim
+//Jeito Bom
 @SpringBootApplication
 public class CriandoExcecoesPersonalizadasApplication {
-
-    public static void main(String[] args) throws ParseException {
+    //throws - propraga a exceção para o proximo programa.
+    public static void main(String[] args){
         Scanner sc = new Scanner(System.in);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-        System.out.print("Room number: ");
-        int number = sc.nextInt();
-        System.out.print("Check- in date (dd/MM/yyyy): ");
-        Date checkIn = sdf.parse(sc.next());
-        System.out.print("Check- Out date (dd/MM/yyyy): ");
-        Date checkOut = sdf.parse(sc.next());
+        try {
+            System.out.print("Room number: ");
+            int number = sc.nextInt();
+            System.out.print("Check- in date (dd/MM/yyyy): ");
+            Date checkIn = sdf.parse(sc.next());
+            System.out.print("Check- Out date (dd/MM/yyyy): ");
+            Date checkOut = sdf.parse(sc.next());
 
-        //.after para saber se uma data é posterior a outra.
-        if (!checkOut.after(checkIn)) {
-            System.out.println("Error in reservation: Check-out date must be after check-in date");
-        } else {
+            //.after para saber se uma data é posterior a outra.
+
             Reservation reservation = new Reservation(number, checkIn, checkOut);
             System.out.println("Reservation: " + reservation);
 
@@ -46,15 +45,22 @@ public class CriandoExcecoesPersonalizadasApplication {
             checkOut = sdf.parse(sc.next());
 
             //Como vai retornar um String, declaramos o metodo como String.
-            String error = reservation.updateDates(checkIn, checkOut);
-            if(error != null){
-                System.out.println("Error in reservation: " + error);
-            }else {
-                System.out.println("Reservation: " + reservation);
-            }
-
-            sc.close();
-
+            reservation.updateDates(checkIn, checkOut);
+            System.out.println("Reservation: " + reservation);
         }
+        //catch - tratamento de exceções;
+        catch(ParseException e) {
+                System.out.println("Invalid date format");
+        }
+        catch (DomainException e ){
+            //getMessage é a mensagem incluida no metodo na classe Reservation
+            System.out.println("Error in reservation : " + e.getMessage());
+        }
+        /*usamos RuntimeException, para quando der qualquer exceção inesperada que não mapeamos
+        assim o programa não irá quebrar.*/
+        catch (RuntimeException e ){
+            System.out.println("Unexpected error");
+        }
+        sc.close();
     }
 }
